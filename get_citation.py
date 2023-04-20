@@ -41,23 +41,39 @@ def get_citation(title):
     print(url, ci_num)
     return ci_num
 
-pub = input('Please enter publication in lower letter (e.g. cvpr) :')
-if not os.path.isfile('./{}/{}_list.csv'.format(pub.upper(), pub)):
-    df_tmp = pd.read_csv('./{}/{}_tmp.csv'.format(pub.upper(), pub))
-    df_tmp['citation'] = -999
-    df_tmp.to_csv('./{}/{}_list.csv'.format(pub.upper(), pub), index=False)
-    del df_tmp
+# pub = input('Please enter publication in lower letter (e.g. cvpr) :')
+# if not os.path.isfile('./{}/{}_list.csv'.format(pub.upper(), pub)):
+#     df_tmp = pd.read_csv('./{}/{}_tmp.csv'.format(pub.upper(), pub))
+#     df_tmp['citation'] = -999
+#     df_tmp.to_csv('./{}/{}_list.csv'.format(pub.upper(), pub), index=False)
+#     del df_tmp
 
-df = pd.read_csv('./{}/{}_list.csv'.format(pub.upper(), pub))
+pubs = ['cvpr', 'icml', 'iccv']
+for pub in pubs:
+    df = pd.read_csv('./{}/{}_list.csv'.format(pub.upper(), pub))
+    for i in range(len(df)):
+        if (i+1)%50==0:
+            print('==========================================')
+            print(f'[{i+1}/{len(df)}]')
+            print('==========================================')
+            df.to_csv('./{}/{}_list.csv'.format(pub.upper(), pub), index=False)
+        title = df['title'][i]
+        if df['citation'][i] != -999:
+            continue
+        ci_num = get_citation(title)
+        df.at[i, 'citation'] = ci_num
+    df.to_csv('./{}/{}_list.csv'.format(pub.upper(), pub), index=False)
+
+df = pd.read_csv('./NeurIPS/neurips_list.csv')
 for i in range(len(df)):
     if (i+1)%50==0:
         print('==========================================')
         print(f'[{i+1}/{len(df)}]')
         print('==========================================')
-        df.to_csv('./{}/{}_list.csv'.format(pub.upper(), pub), index=False)
+        df.to_csv('./NeurIPS/neurips_list.csv', index=False)
     title = df['title'][i]
     if df['citation'][i] != -999:
         continue
     ci_num = get_citation(title)
     df.at[i, 'citation'] = ci_num
-
+    df.to_csv('./NeurIPS/neurips_list.csv', index=False)
